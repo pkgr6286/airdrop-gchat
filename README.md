@@ -547,3 +547,6 @@ All required source code is listed in Section 3.0 of this document.
     - `GET https://chat.googleapis.com/v1/spaces`
     - `GET https://chat.googleapis.com/v1/spaces/{spaceName}/messages`
 - **Authentication**: OAuth 2.0 Bearer Token.
+
+<img width="829" height="1879" alt="9fdff00b-15e2-44d1-9c6c-c3af24c31b42" src="https://github.com/user-attachments/assets/a9237576-4a20-4ee3-ab8e-5dc84f031fcd" />
+  
