@@ -138,7 +138,6 @@ Bash
 
 Clone or download the starter Airdrop snap-in template from the official DevRev repository. This will be the base for our project.
 
----
 
 ### **3.0 Implementation Guide: Building the Snap-in**
 
@@ -460,7 +459,6 @@ processTask<ExtractorState>({
   },
 });`
 
----
 
 ### **4.0 Deployment and Usage Guide**
 
@@ -502,7 +500,6 @@ Once the import is complete, navigate to your work items list. You will find new
 
 After the initial import, you can configure the Airdrop to run on a periodic schedule (e.g., every hour) to automatically pull in new messages and keep DevRev in sync.
 
----
 
 ### **5.0 Troubleshooting**
 
@@ -534,7 +531,6 @@ Bash
 
 `devrev snap_in_package logs | jq`
 
----
 
 ### **6.0 Appendix**
 
