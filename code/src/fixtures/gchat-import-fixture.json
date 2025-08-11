@@ -1,0 +1,22 @@
+[
+    {
+      "payload": {
+        "event_type": "ExtractionDataStart",
+        "event_context": {
+          "sync_unit": "spaces/YOUR_TEST_SPACE_ID"
+        },
+        "connection_data": {
+          "key": "YOUR_TEMPORARY_GOOGLE_OAUTH_TOKEN"
+        }
+      },
+      "context": {
+        "snap_in_id": "don:integration:...",
+        "dev_org_id": "don:identity:...",
+        "dev_user_id": "don:identity:..."
+      },
+      "execution_metadata": {
+        "function_name": "extraction",
+        "devrev_endpoint": "https://api.devrev.ai"
+      }
+    }
+  ]

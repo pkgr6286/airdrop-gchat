@@ -1,56 +1,53 @@
-import { ExternalSyncUnit, NormalizedAttachment, NormalizedItem } from '@devrev/ts-adaas';
+import { NormalizedItem, ExternalSyncUnit } from '@devrev/ts-adaas';
 
-// TODO: Replace with your actual normalization functions that will be used to
-// normalize the data received from the external system. You can modify the
-// normalization functions to suit your needs. For example, you might want to
-// include additional fields or change the structure of the normalized item.
-export function normalizeTodoList(item: any): ExternalSyncUnit {
+// Normalizes a Google Chat Space object
+export function normalizeSpace(space: any): ExternalSyncUnit {
   return {
-    id: item.id,
-    name: item.name,
-    description: item.description,
-    item_count: item.item_count,
-    item_type: item.item_type,
+    id: space.name, // e.g., "spaces/AAAAAAAAAAA"
+    name: space.displayName,
+    description: space.spaceDetails?.description || 'A Google Chat Space',
+    item_count: -1, // We don't know the message count upfront
   };
 }
 
-export function normalizeTodo(item: any): NormalizedItem {
-  // createItemUrl function returns the url that points to this item in the external system.
-  // TODO: Adjust this function to your external system.
-  const createItemUrl = (id: string) => `https://external-system.com/todos/${id}`;
-
+// Normalizes a Google Chat User object
+export function normalizeUser(user: any): NormalizedItem {
+  const now = new Date().toISOString();
   return {
-    id: item.id,
-    created_date: item.created_date,
-    modified_date: item.modified_date,
+    id: user.name, // e.g., "users/123456789"
+    created_date: now,
+    modified_date: now,
     data: {
-      body: item.body,
-      creator: item.creator,
-      owner: item.owner,
-      title: item.title,
-      item_url_field: createItemUrl(item.id), // Url that points to the item in the external system.
+      email: user.email,
+      displayName: user.displayName,
     },
   };
 }
 
-export function normalizeUser(item: any): NormalizedItem {
+// Normalizes a Google Chat Message object
+export function normalizeMessage(message: any, threadId: string): NormalizedItem {
   return {
-    id: item.id,
-    created_date: item.created_date,
-    modified_date: item.modified_date,
+    id: message.name, // e.g., "spaces/AAA/messages/BBB"
+    created_date: message.createTime,
+    modified_date: message.lastUpdateTime || message.createTime,
     data: {
-      email: item.email,
-      name: item.name,
+      text: [message.text], // Wrap in array for rich_text format
+      creator: message.sender.name,
+      parent_id: threadId,
     },
   };
 }
 
-export function normalizeAttachment(item: any): NormalizedAttachment {
+// Creates a logical Thread object from the first message of a thread
+export function normalizeThread(firstMessage: any): NormalizedItem {
   return {
-    url: item.url,
-    id: item.id,
-    file_name: item.file_name,
-    author_id: item.author_id,
-    parent_id: item.parent_id,
+    id: firstMessage.thread.name, // e.g., "spaces/AAA/threads/CCC"
+    created_date: firstMessage.createTime,
+    modified_date: firstMessage.lastUpdateTime || firstMessage.createTime,
+    data: {
+      title: firstMessage.text.substring(0, 100), // Use first 100 chars as title
+      body: [firstMessage.text], // Use full text as body
+      space_id: firstMessage.space.name,
+    },
   };
 }

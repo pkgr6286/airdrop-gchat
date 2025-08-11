@@ -1,142 +1,51 @@
 {
   "additional_mappings": {
+    "format_version": "v0.2.0",
     "record_type_mappings": {
-      "todos": {
+      "gchat_thread": {
         "default_mapping": {
           "object_category": "stock",
-          "object_type": "issue"
+          "object_type": "ticket"
         },
-        "possible_record_type_mappings": [
-          {
-            "devrev_leaf_type": "issue",
-            "forward": true,
-            "reverse": true,
-            "shard": {
-              "constructed_custom_fields": {
-                "ext_object_type": {
-                  "field_descriptor": {
-                    "allowed_values": ["Todos"],
-                    "data_name": "ext_object_type",
-                    "db_name": "ext_object_type",
-                    "default_value": "Todos",
-                    "description": "The source object type/subtype that the item was created from.",
-                    "field_type": "enum",
-                    "is_filterable": true,
-                    "is_required": true,
-                    "name": "ext_object_type",
-                    "oasis": {
-                      "name": "ext_object_type"
-                    },
-                    "ui": {
-                      "display_name": "External Object Type",
-                      "is_hidden_during_create": true,
-                      "is_read_only": true
-                    }
-                  },
-                  "transformation_method": {
-                    "can_apply_to_null": false,
-                    "custom_field_type": {
-                      "allowed_values": ["Todos"],
-                      "data_name": "dummy name",
-                      "db_name": "dummy name",
-                      "field_type": "enum",
-                      "name": "dummy name",
-                      "oasis": {
-                        "name": "dummy name"
-                      }
-                    },
-                    "forward_jq": "\"Todos\"",
-                    "transformation_method": "use_raw_jq",
-                    "use_primary_input": false
-                  }
-                }
-              },
-              "devrev_leaf_type": {
-                "object_category": "stock",
-                "object_type": "issue"
-              },
-              "mode": "create_shard",
-              "stock_field_mappings": {
-                "applies_to_part_id": {
-                  "forward": true,
-                  "reverse": false,
-                  "transformation_method_for_set": {
-                    "is_array": false,
-                    "leaf_type": {
-                      "object_category": "stock",
-                      "object_type": "product"
-                    },
-                    "transformation_method": "use_devrev_record"
-                  }
-                },
-                "body": {
-                  "forward": true,
-                  "primary_external_field": "body",
-                  "reverse": true,
-                  "transformation_method_for_set": {
-                    "transformation_method": "use_directly"
-                  }
-                },
-                "created_by_id": {
-                  "forward": true,
-                  "primary_external_field": "creator",
-                  "reverse": true,
-                  "transformation_method_for_set": {
-                    "transformation_method": "use_directly"
-                  }
-                },
-                "item_url_field": {
-                  "forward": true,
-                  "primary_external_field": "item_url_field",
-                  "reverse": false,
-                  "transformation_method_for_set": {
-                    "transformation_method": "use_directly"
-                  }
-                },
-                "owned_by_ids": {
-                  "forward": true,
-                  "primary_external_field": "owner",
-                  "reverse": true,
-                  "transformation_method_for_set": {
-                    "transformation_method": "use_as_array_value"
-                  }
-                },
-                "priority": {
-                  "forward": true,
-                  "reverse": false,
-                  "transformation_method_for_set": {
-                    "enum": "P1",
-                    "transformation_method": "use_fixed_value",
-                    "value": "enum_value"
-                  }
-                },
-                "stage": {
-                  "forward": true,
-                  "reverse": false,
-                  "transformation_method_for_set": {
-                    "enum": "in_development",
-                    "transformation_method": "use_fixed_value",
-                    "value": "enum_value"
-                  }
-                },
-                "title": {
-                  "fallback": {
-                    "type": "text",
-                    "value": "Fallback title"
-                  },
-                  "forward": true,
-                  "primary_external_field": "title",
-                  "reverse": true,
-                  "transformation_method_for_set": {
-                    "transformation_method": "use_directly"
-                  }
-                }
-              }
+        "possible_record_type_mappings": [{
+          "devrev_leaf_type": "ticket",
+          "forward": true,
+          "reverse": false,
+          "shard": {
+            "devrev_leaf_type": { "object_category": "stock", "object_type": "ticket" },
+            "mode": "create_shard",
+            "stock_field_mappings": {
+              "title": { "forward": true, "primary_external_field": "title", "transformation_method_for_set": { "transformation_method": "use_directly" }},
+              "body": { "forward": true, "primary_external_field": "body", "transformation_method_for_set": { "transformation_method": "use_directly" }},
+              "applies_to_part_id": { "forward": true, "transformation_method_for_set": { "leaf_type": { "object_category": "stock", "object_type": "product" }, "transformation_method": "use_devrev_record" }},
+              "owned_by_ids": { "forward": true, "transformation_method_for_set": { "leaf_type": { "object_category": "stock", "object_type": "devu" }, "transformation_method": "use_devrev_record" }},
+              "stage": { "forward": true, "transformation_method_for_set": { "enum": "queued", "transformation_method": "use_fixed_value", "value": "enum_value" }},
+              "severity": { "forward": true, "transformation_method_for_set": { "enum": "medium", "transformation_method": "use_fixed_value", "value": "enum_value" }}
             }
           }
-        ]
+        }]
       },
-      "users": {
+      "gchat_message": {
+        "default_mapping": {
+          "object_category": "stock",
+          "object_type": "comment"
+        },
+        "possible_record_type_mappings": [{
+          "devrev_leaf_type": "comment",
+          "forward": true,
+          "reverse": false,
+          "shard": {
+            "devrev_leaf_type": { "object_category": "stock", "object_type": "comment" },
+            "mode": "create_shard",
+            "stock_field_mappings": {
+              "body": { "forward": true, "primary_external_field": "text", "transformation_method_for_set": { "transformation_method": "use_directly" }},
+              "parent_object_id": { "forward": true, "primary_external_field": "parent_id", "transformation_method_for_set": { "transformation_method": "use_directly" }},
+              "created_by_id": { "forward": true, "primary_external_field": "creator", "transformation_method_for_set": { "transformation_method": "use_directly" }}
+            }
+          }
+        }]
+      },
+      "gchat_user": {
         "default_mapping": {
           "object_category": "stock",
           "object_type": "devu"
@@ -147,32 +56,16 @@
             "forward": true,
             "reverse": false,
             "shard": {
-              "constructed_custom_fields": {},
-              "devrev_leaf_type": {
-                "object_category": "stock",
-                "object_type": "devu"
-              },
+              "devrev_leaf_type": { "object_category": "stock", "object_type": "devu" },
               "mode": "create_shard",
               "stock_field_mappings": {
-                "display_name": {
-                  "fallback": {
-                    "type": "text",
-                    "value": "Fallback name"
-                  },
-                  "forward": true,
-                  "primary_external_field": "name",
-                  "reverse": false,
-                  "transformation_method_for_set": {
-                    "transformation_method": "use_directly"
-                  }
-                }
+                "display_name": { "forward": true, "primary_external_field": "displayName", "transformation_method_for_set": { "transformation_method": "use_directly" }},
+                "email": { "forward": true, "primary_external_field": "email", "transformation_method_for_set": { "transformation_method": "use_directly" }}
               }
             }
           }
         ]
       }
-    },
-    "format_version": "v0.2.0",
-    "devrev_metadata_version": 13
+    }
   }
 }

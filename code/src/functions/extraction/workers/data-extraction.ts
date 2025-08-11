@@ -1,67 +1,66 @@
 import { ExtractorEventType, processTask } from '@devrev/ts-adaas';
-
-import { normalizeAttachment, normalizeTodo, normalizeUser } from '../../external-system/data-normalization';
+import {
+  normalizeMessage,
+  normalizeThread,
+  normalizeUser,
+} from '../../external-system/data-normalization';
 import { HttpClient } from '../../external-system/http-client';
 import { ExtractorState } from '../index';
 
-// TODO: Replace with actual repos that will be used to store the
-// data extracted from the external system. For example, you might want to
-// create repos for todos, users, and attachments. Also replace and modify
-// the normalization functions which are used to normalize the data.
 const repos = [
-  {
-    itemType: 'todos',
-    normalize: normalizeTodo,
-  },
-  {
-    itemType: 'users',
-    normalize: normalizeUser,
-  },
-  {
-    itemType: 'attachments',
-    normalize: normalizeAttachment,
-  },
-];
-
-// TODO: Replace with item types you want to extract from the external system.
-// Also replace the extract functions with the actual functions that will be
-// used to extract the data. You can use this to easier iterate over the item
-// types and extract them.
-interface ItemTypeToExtract {
-  name: 'todos' | 'users' | 'attachments';
-  extractFunction: (client: HttpClient) => Promise<any[]>;
-}
-
-const itemTypesToExtract: ItemTypeToExtract[] = [
-  {
-    name: 'todos',
-    extractFunction: (client: HttpClient) => client.getTodos(),
-  },
-  {
-    name: 'users',
-    extractFunction: (client: HttpClient) => client.getUsers(),
-  },
-  {
-    name: 'attachments',
-    extractFunction: (client: HttpClient) => client.getAttachments(),
-  },
+  { itemType: 'gchat_thread' },
+  { itemType: 'gchat_message' },
+  { itemType: 'gchat_user' },
 ];
 
 processTask<ExtractorState>({
   task: async ({ adapter }) => {
     adapter.initializeRepos(repos);
-
-    // TODO: Replace with HTTP client that will be used to make API calls
-    // to the external system.
     const httpClient = new HttpClient(adapter.event);
 
-    // TODO: Replace with your implementation to extract data from the external
-    // system. This is just an example how you can iterate over the item types,
-    // extract them, push them to the repo, and save the state.
-    for (const itemTypeToExtract of itemTypesToExtract) {
-      const items = await itemTypeToExtract.extractFunction(httpClient);
-      await adapter.getRepo(itemTypeToExtract.name)?.push(items);
-      adapter.state[itemTypeToExtract.name].completed = true;
+    const spaceName = adapter.event.payload.event_context.sync_unit;
+    const allMessages = await httpClient.listMessages(spaceName);
+
+    // Group messages by their thread name
+    const threadsMap = new Map<string, any[]>();
+    const usersMap = new Map<string, any>();
+
+    for (const message of allMessages) {
+      // Skip empty or deleted messages
+      if (!message.text || !message.thread?.name) continue;
+
+      const threadId = message.thread.name;
+      if (!threadsMap.has(threadId)) {
+        threadsMap.set(threadId, []);
+      }
+      threadsMap.get(threadId)?.push(message);
+
+      // Collect unique users
+      if (!usersMap.has(message.sender.name)) {
+        usersMap.set(message.sender.name, message.sender);
+      }
+    }
+
+    // Process each thread
+    for (const [threadId, messages] of threadsMap.entries()) {
+      // Sort messages by creation time to find the first one
+      messages.sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
+
+      const firstMessage = messages[0];
+
+      // Create and push the logical thread object
+      const threadItem = normalizeThread(firstMessage);
+      await adapter.getRepo('gchat_thread')?.push([threadItem]);
+
+      // Create and push message objects for all messages in the thread
+      const messageItems = messages.map((msg) => normalizeMessage(msg, threadId));
+      await adapter.getRepo('gchat_message')?.push(messageItems);
+    }
+
+    // Push all unique user objects
+    const userItems = Array.from(usersMap.values()).map((user) => normalizeUser(user));
+    if (userItems.length > 0) {
+      await adapter.getRepo('gchat_user')?.push(userItems);
     }
 
     await adapter.emit(ExtractorEventType.ExtractionDataDone);

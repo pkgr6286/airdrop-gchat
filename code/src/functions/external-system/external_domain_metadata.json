@@ -1,62 +1,71 @@
 {
   "schema_version": "v0.2.0",
   "record_types": {
-    "todos": {
-      "name": "Todos",
-      "is_loadable": true,
+    "gchat_space": {
+      "name": "Google Chat Space"
+    },
+    "gchat_thread": {
+      "name": "Google Chat Thread",
       "fields": {
-        "body": {
-          "name": "body",
-          "is_required": true,
-          "type": "rich_text"
-        },
-        "creator": {
-          "is_required": true,
-          "type": "reference",
-          "reference": {
-            "refers_to": {
-              "#record:users": {}
-            }
-          }
-        },
-        "owner": {
-          "is_required": true,
-          "type": "reference",
-          "reference": {
-            "refers_to": {
-              "#record:users": {}
-            }
-          }
-        },
         "title": {
           "name": "Title",
           "is_required": true,
-          "type": "text",
-          "text": {
-            "min_length": 1
-          }
+          "type": "text"
         },
-        "item_url_field": {
-          "name": "Link to item",
+        "body": {
+          "name": "Body",
+          "is_required": true,
+          "type": "rich_text"
+        },
+        "space_id": {
+          "name": "Space ID",
+          "is_required": true,
           "type": "text"
         }
       }
     },
-    "users": {
-      "name": "Users",
+    "gchat_message": {
+      "name": "Google Chat Message",
+      "fields": {
+        "text": {
+          "name": "Text",
+          "is_required": true,
+          "type": "rich_text"
+        },
+        "creator": {
+          "name": "Creator",
+          "is_required": true,
+          "type": "reference",
+          "reference": {
+            "refers_to": {
+              "#record:gchat_user": {}
+            }
+          }
+        },
+        "parent_id": {
+          "name": "Parent Thread",
+          "is_required": true,
+          "type": "reference",
+          "reference": {
+            "refers_to": {
+              "#record:gchat_thread": {}
+            }
+          }
+        }
+      }
+    },
+    "gchat_user": {
+      "name": "Google Chat User",
       "fields": {
         "email": {
           "name": "Email",
           "is_required": true,
           "type": "text"
         },
-        "name": {
-          "name": "Name",
+        "displayName": {
+          "name": "Display Name",
           "is_required": true,
-          "type": "text",
-          "text": {
-            "min_length": 1
-          }
+          "type": "text"
         }
       }
     }
