@@ -147,13 +147,79 @@ This section provides the complete source code to replace the placeholder files 
 
 YAML
 
-`name: google-chat-airdrop-connector
+version: "2"
+
+name: google-chat-airdrop-connector
 description: Google Chat Connector for importing messages and threads into DevRev.
-version: '1.0'
+
+service_account:
+  display_name: Google Chat Bot
 
 functions:
   - name: extraction
     description: Extraction function for the Google Chat snap-in
+
+developer_keyrings:
+  - name: google-chat-oauth-secret
+    description: DevRev developer keyring to store OAuth2 credentials for Google Chat.
+    display_name: Google Chat OAuth Secret
+
+keyrings:
+  organization:
+    - name: google_chat_connection
+      display_name: Google Chat Connection
+      description: The Google Chat connection for the organization.
+      types:
+        - google-chat-connection
+
+keyring_types:
+  - id: google-chat-connection
+    name: "Google Chat Connection"
+    description: "Connect to Google Chat using OAuth2"
+    kind: "oauth2"
+    scopes: # Scopes that the connection can request, add more scopes if needed for your use case. Each scope should have a name, description and value.
+      - name: chat.messages.readonly
+        description: Read access to chat messages
+        value: "https://www.googleapis.com/auth/chat.messages.readonly"
+      - name: chat.spaces.readonly
+        description: Read access to chat spaces
+        value: "https://www.googleapis.com/auth/chat.spaces.readonly"
+    is_subdomain: false
+    external_system_name: Google Chat
+    oauth_secret: google-chat-oauth-secret
+    scope_delimiter: " "
+    authorize: # The authorize section is used to get the authorization code from the user and exchange it for an access token.
+      type: "config"
+      auth_url: "https://accounts.google.com/o/oauth2/v2/auth"
+      token_url: "https://oauth2.googleapis.com/token"
+      grant_type: "authorization_code"
+      auth_query_parameters:
+        "client_id": "[CLIENT_ID]"
+        "scope": "[SCOPES]"
+        "response_type": "code"
+      token_query_parameters:
+        "client_id": "[CLIENT_ID]"
+        "client_secret": "[CLIENT_SECRET]"
+    refresh: # The refresh section is used to refresh the access token using the refresh token.
+      type: "config"
+      url: "https://oauth2.googleapis.com/token"
+      method: "POST"
+      query_parameters:
+        "client_id": "[CLIENT_ID]"
+        "client_secret": "[CLIENT_SECRET]"
+        "refresh_token": "[REFRESH_TOKEN]"
+      headers:
+        "Content-type": "application/x-www-form-urlencoded"
+    revoke: # The revoke section is used to revoke the access token.
+      type: "config"
+      url: "https://oauth2.googleapis.com/revoke"
+      method: "POST"
+      headers:
+        "Content-type": "application/x-www-form-urlencoded"
+      query_parameters:
+        "client_id": "[CLIENT_ID]"
+        "client_secret": "[CLIENT_SECRET]"
+        "token": "[ACCESS_TOKEN]"
 
 imports:
   - slug: google-chat-import
@@ -162,23 +228,6 @@ imports:
     extractor_function: extraction
     allowed_connection_types:
       - google-chat-connection
-
-keyring_types:
-  - id: google-chat-connection
-    name: Google Chat Connection
-    description: Connect to Google Chat using OAuth2
-    kind: "oauth2"
-    is_subdomain: false
-    external_system_name: Google Chat
-    oauth2_config:
-      auth_url: 'https://accounts.google.com/o/oauth2/v2/auth'
-      token_url: 'https://oauth2.googleapis.com/token'
-      scope: 'https://www.googleapis.com/auth/chat.messages.readonly https://www.googleapis.com/auth/chat.spaces.readonly'
-      organization_data:
-        type: "config"
-        url: 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json'
-        method: 'GET'
-        response_jq: '{id: .email, name: .name}'`
 
 ### **3.2. Defining the External Data Schema (`src/functions/external-system/external_domain_metadata.json`)**
 
@@ -499,6 +548,13 @@ Once the import is complete, navigate to your work items list. You will find new
 ### **4.4. Scheduling Ongoing Synchronization**
 
 After the initial import, you can configure the Airdrop to run on a periodic schedule (e.g., every hour) to automatically pull in new messages and keep DevRev in sync.
+
+<img width="1889" height="534" alt="Screenshot 2025-08-12 at 2 25 18 PM" src="https://github.com/user-attachments/assets/3860594c-1f3c-4c7c-9d08-1df511dfa076" />
+<img width="1444" height="574" alt="Screenshot 2025-08-12 at 2 25 25 PM" src="https://github.com/user-attachments/assets/e412fda3-0678-493c-b2e8-d1155b689643" />
+<img width="672" height="687" alt="Screenshot 2025-08-12 at 2 25 35 PM" src="https://github.com/user-attachments/assets/2678de4f-3c49-49b2-a39a-217ec317b024" />
+<img width="716" height="403" alt="Screenshot 2025-08-12 at 2 25 42 PM" src="https://github.com/user-attachments/assets/57aa8980-bd52-4c7f-af72-48a65c380d23" />
+<img width="711" height="638" alt="Screenshot 2025-08-12 at 2 25 48 PM" src="https://github.com/user-attachments/assets/03498c3b-e28f-4cfe-963f-cd277b2995cc" />
+
 
 
 ### **5.0 Troubleshooting**
