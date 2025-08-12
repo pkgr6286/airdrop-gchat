@@ -14,9 +14,13 @@ import { LoaderState } from '../index';
 async function createAttachment({ item, mappers, event }: ExternalSystemItemLoadingParams<ExternalSystemAttachment>) {
   // TODO: Replace with your HTTP client that will be used to make API calls
   // to the external system.
-  const httpClient = new HttpClient(event);
-  const createAttachmentResponse = await httpClient.createAttachment(item);
-  return createAttachmentResponse;
+  // const httpClient = new HttpClient(event);
+  // const createAttachmentResponse = await httpClient.createAttachment(item);
+  // return createAttachmentResponse;
+  return {
+    http_stream: undefined,
+    error: undefined,
+  };
 }
 
 processTask<LoaderState>({

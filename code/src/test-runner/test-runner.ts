@@ -24,8 +24,6 @@ export function addCredentials(events: AirdropEvent[], env: dotenv.DotenvParseOu
 export const testRunner = async ({ functionName, fixturePath }: TestRunnerProps) => {
   const env = dotenv.config();
 
-  console.log('env:', env);
-
   if (!functionFactory[functionName]) {
     console.error(`${functionName} is not found in the functionFactory`);
     console.error('Add your function to the function-factory.ts file');

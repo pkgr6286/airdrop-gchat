@@ -6,7 +6,7 @@ import initialDomainMapping from '../external-system/initial_domain_mapping.json
 // extraction progress. For example, the page number, the number of items
 // processed, if the extraction is completed, etc.
 export interface ExtractorState {
-  todos: { completed: boolean };
+  messages: { completed: boolean };
   users: { completed: boolean };
   attachments: { completed: boolean };
 }
@@ -14,7 +14,7 @@ export interface ExtractorState {
 // TODO: Replace with your initial state that will be passed to the worker.
 // This state will be used as a starting point for the extraction process.
 export const initialExtractorState: ExtractorState = {
-  todos: { completed: false },
+  messages: { completed: false },
   users: { completed: false },
   attachments: { completed: false },
 };

@@ -13,7 +13,7 @@ import { LoaderState } from '../index';
 // TODO: Replace with your create function that will be used to make API calls
 // to the external system to create a new item. Function must return object with
 // id, error or delay depending on the response from the external system.
-async function createTodo({
+async function createMessage({
   item,
   mappers,
   event,
@@ -23,15 +23,20 @@ async function createTodo({
   const httpClient = new HttpClient(event);
   const todo = denormalizeTodo(item);
 
-  const createTodoResponse = await httpClient.createTodo(todo);
-  return createTodoResponse;
+  const messages = await httpClient.listMessages(todo.name);
+  console.log(messages);
+  return {
+    id: todo.id,
+    error: undefined,
+    delay: undefined,
+  };
 }
 
 // TODO: Replace with your update function that will be used to make API calls
 // to the external system to update an existing item. Function must return
 // object with id, error or delay depending on the response from the external
 // system.
-async function updateTodo({
+async function updateMessage({
   item,
   mappers,
   event,
@@ -52,8 +57,13 @@ async function updateTodo({
 
   const todo = denormalizeTodo(item);
 
-  const updateTodoResponse = await httpClient.updateTodo(todo);
-  return updateTodoResponse;
+  const messages = await httpClient.listMessages(todo.name);
+  console.log(messages);
+  return {
+    id: todo.id,
+    error: undefined,
+    delay: undefined,
+  };
 }
 
 processTask<LoaderState>({
@@ -61,9 +71,9 @@ processTask<LoaderState>({
     const { reports, processed_files } = await adapter.loadItemTypes({
       itemTypesToLoad: [
         {
-          itemType: 'todos',
-          create: createTodo,
-          update: updateTodo,
+          itemType: 'gchat_message',
+          create: createMessage,
+          update: updateMessage,
         },
       ],
     });

@@ -30,7 +30,7 @@ export class HttpClient {
     let pageToken: string | undefined = undefined;
 
     do {
-      const url = `${this.apiEndpoint}/${spaceName}/messages?pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ''}`;
+      const url: string = `${this.apiEndpoint}/${spaceName}/messages?pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ''}`;
       const response = await axios.get(url, { headers: this.getAuthHeaders() });
 
       if (response.data.messages) {
